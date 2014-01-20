@@ -5,28 +5,27 @@ module Spree
     ssl_required :show
     
     def show
-      @order =  Spree::Order.find(params[:order_id])
+      @order = Spree::Order.find(params[:order_id])
       @gateway = @order.available_payment_methods.detect{|x| x.id == params[:gateway_id].to_i }
 
       if @order.blank? || @gateway.blank?
         flash[:error] = I18n.t("invalid_arguments")
         redirect_to :back
       else
-        @signature =  Digest::MD5.hexdigest([ @gateway.options[:mrch_login],
-                                              @order.total, @order.id, @gateway.options[:password1]
-                                            ].join(':')).upcase
+        @signature = Digest::MD5.hexdigest([
+          @gateway.options[:mrch_login],
+          @order.total, @order.id, @gateway.options[:password1]
+        ].join(':')).upcase
         render :action => :show
       end
     end
 
     def result
       payment = @order.payments.create(
-          amount: params["OutSum"].to_f
+          amount: params["OutSum"].to_f,
           payment_method_id: @order.available_payment_methods.first.id)
-      payment.started_processing!
 
       if @order && @gateway && valid_signature?(@gateway.options[:password2])
-        payment.complete!
         # Need to force checkout to complete state
         until @order.state == "complete"
           if @order.next!
