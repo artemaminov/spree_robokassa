@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = SpreeRobokassa::VERSION
   spec.authors       = ["Artem Aminov"]
   spec.email         = ["artemaminov@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = "Robokassa gem for Spree. Integrates Robokassa payment"
+  spec.summary       = "Add Robokassa payment to Spree"
+  spec.homepage      = "http://github.com/artemaminov/spree_robokassa.git"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
