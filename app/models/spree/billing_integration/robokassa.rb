@@ -1,5 +1,5 @@
 module Spree
-  class BillingIntegration::Robokassa < BillingIntegration
+  class BillingIntegration::Robokassa < Spree::BillingIntegration
     preference :password1, :string
     preference :password2, :string
     preference :mrch_login, :string
