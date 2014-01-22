@@ -1,2 +1,2 @@
-Synergy Robokassa
+Spree Robokassa
 =====================

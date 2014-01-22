@@ -1,20 +1,21 @@
 module Spree
-  class Gateway::RobokassaController < Spree::BaseController
+  class RobokassaController < Spree::BaseController
     skip_before_filter :verify_authenticity_token, :only => [:result, :success, :fail]
     before_filter :load_order,                     :only => [:result, :success, :fail]
     ssl_required :show
     
     def show
       @order = Spree::Order.find(params[:order_id])
-      @gateway = @order.available_payment_methods.detect{|x| x.id == params[:gateway_id].to_i }
+      robokassa_payment_method = Spree::PaymentMethod.find_by_type('Spree::BillingIntegration::Robokassa')
+      @payment_method = @order.available_payment_methods.detect{|x| x.id == robokassa_payment_method.id }
 
-      if @order.blank? || @gateway.blank?
+      if @order.blank? || @payment_method.blank?
         flash[:error] = I18n.t("invalid_arguments")
         redirect_to :back
       else
         @signature = Digest::MD5.hexdigest([
-          @gateway.options[:mrch_login],
-          @order.total, @order.id, @gateway.options[:password1]
+          @payment_method.options[:mrch_login],
+          @order.total, @order.id, @payment_method.options[:password1]
         ].join(':')).upcase
         render :action => :show
       end
@@ -25,7 +26,7 @@ module Spree
           amount: params["OutSum"].to_f,
           payment_method_id: @order.available_payment_methods.first.id)
 
-      if @order && @gateway && valid_signature?(@gateway.options[:password2])
+      if @order && @payment_method && valid_signature?(@payment_method.options[:password2])
         # Need to force checkout to complete state
         until @order.state == "complete"
           if @order.next!
@@ -42,16 +43,11 @@ module Spree
     end
 
     def success
-      if @order && @gateway && valid_signature?(@gateway.options[:password1]) && @order.complete?
+      if @order && @payment_method && valid_signature?(@payment_method.options[:password1]) && @order.complete?
         session[:order_id] = nil
         redirect_to order_path(@order), :notice => I18n.t("payment_success")
       else
         flash[:error] =  t("payment_fail")
-        
-        # Check vars
-        # 
-        flash[:error] = '@order.completed?=' + @order.completed?.to_s + ', @order.complete?=' + @order.complete?.to_s + ', valid_signature?=' + valid_signature?(@gateway.options[:password1]).to_s
-        redirect_to root_url
       end
     end
 
@@ -64,7 +60,7 @@ module Spree
 
     def load_order
       @order = Spree::Order.find_by_id(params["InvId"])
-      @gateway = Spree::Gateway::Robokassa.current
+      @payment_method = Spree::Gateway::Robokassa.current
     end
 
     def valid_signature?(key)

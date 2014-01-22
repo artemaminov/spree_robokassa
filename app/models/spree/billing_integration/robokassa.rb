@@ -1,5 +1,5 @@
 module Spree
-  class Gateway::Robokassa < Spree::Gateway
+  class BillingIntegration::Robokassa < BillingIntegration
     preference :password1, :string
     preference :password2, :string
     preference :mrch_login, :string
@@ -7,11 +7,11 @@ module Spree
     attr_accessible :preferred_password1, :preferred_password2, :preferred_mrch_login
 
     def provider_class
-      self.class
+      ActiveMerchant::Billing::Integrations::Robokassa
     end
 
-    def method_type
-      "robokassa"
+    def source_required?
+      false
     end
 
     def test?
@@ -21,7 +21,7 @@ module Spree
     def url
       self.test? ? "http://test.robokassa.ru/Index.aspx" : "https://merchant.roboxchange.com/Index.aspx"
     end
-    
+
     def self.current
       self.where(:type => self.to_s, :environment => Rails.env, :active => true).first
     end
@@ -33,7 +33,6 @@ module Spree
         <label> #{I18n.t('robokassa.fail_url')}: </label> http://[domain]/gateway/robokassa/fail<br />
       </p>"
     end
+
   end
-
-
 end
