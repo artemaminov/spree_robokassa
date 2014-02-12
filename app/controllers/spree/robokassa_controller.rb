@@ -1,11 +1,15 @@
 module Spree
-  class RobokassaController < Spree::BaseController
+  class RobokassaController < Spree::CheckoutController
+    require 'active_merchant'
+    require 'active_merchant/billing/integrations/action_view_helper'
+    ActionView::Base.send(:include, ActiveMerchant::Billing::Integrations::ActionViewHelper)
+
     skip_before_filter :verify_authenticity_token, :only => [:result, :success, :fail]
-    before_filter :load_order,                     :only => [:result, :success, :fail]
+    #before_filter :load_order, :only => [:result, :success, :fail]
     ssl_required :show
-    
+
     def show
-      @order = Spree::Order.find(params[:order_id])
+      #@order = Spree::Order.find_by_number(params[:order_number])
       robokassa_payment_method = Spree::PaymentMethod.find_by_type('Spree::BillingIntegration::Robokassa')
       @payment_method = @order.available_payment_methods.detect{|x| x.id == robokassa_payment_method.id }
 
@@ -13,10 +17,11 @@ module Spree
         flash[:error] = I18n.t("invalid_arguments")
         redirect_to :back
       else
-        @signature = Digest::MD5.hexdigest([
-          @payment_method.options[:mrch_login],
-          @order.total, @order.id, @payment_method.options[:password1]
-        ].join(':')).upcase
+        #@signature = ActiveMerchant::Billing::Integrations::Robokassa.notification(params)
+        #    Digest::MD5.hexdigest([
+        #  @payment_method.options[:mrch_login],
+        #  @order.total, @order.id, @payment_method.options[:password1]
+        #].join(':')).upcase
         render :action => :show
       end
     end
@@ -58,16 +63,10 @@ module Spree
 
     private
 
-    def load_order
-      @order = Spree::Order.find_by_id(params["InvId"])
-      @payment_method = Spree::Gateway::Robokassa.current
-    end
-
     def valid_signature?(key)
       params["SignatureValue"].upcase == Digest::MD5.hexdigest([params["OutSum"], params["InvId"], key ].join(':')).upcase
     end
 
-  end
 
-  
+  end
 end

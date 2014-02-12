@@ -14,6 +14,10 @@ module Spree
       false
     end
 
+    def method_type
+      "robokassa"
+    end
+
     def test?
       options[:test_mode] == true
     end
