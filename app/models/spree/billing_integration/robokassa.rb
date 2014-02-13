@@ -22,21 +22,25 @@ module Spree
       options[:test_mode] == true
     end
 
-    def url
-      self.test? ? "http://test.robokassa.ru/Index.aspx" : "https://merchant.roboxchange.com/Index.aspx"
+    #def url
+    #  self.test? ? "http://test.robokassa.ru/Index.aspx" : "https://merchant.roboxchange.com/Index.aspx"
+    #end
+
+    def mode
+      self.test? ? :test : :production
     end
 
-    def self.current
-      self.where(:type => self.to_s, :environment => Rails.env, :active => true).first
-    end
+    #def self.current
+    #  self.where(:type => self.to_s, :environment => Rails.env, :active => true).first
+    #end
 
-    def desc
-      "<p>
-        <label> #{I18n.t('robokassa.success_url')}: </label> http://[domain]/gateway/robokassa/success<br />
-        <label> #{I18n.t('robokassa.result_url')}: </label> http://[domain]/gateway/robokassa/result<br />
-        <label> #{I18n.t('robokassa.fail_url')}: </label> http://[domain]/gateway/robokassa/fail<br />
-      </p>"
-    end
+    #def desc
+    #  "<p>
+    #    <label> #{I18n.t('robokassa.success_url')}: </label> http://[domain]/gateway/robokassa/success<br />
+    #    <label> #{I18n.t('robokassa.result_url')}: </label> http://[domain]/gateway/robokassa/result<br />
+    #    <label> #{I18n.t('robokassa.fail_url')}: </label> http://[domain]/gateway/robokassa/fail<br />
+    #  </p>"
+    #end
 
   end
 end
