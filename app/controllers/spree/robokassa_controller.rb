@@ -8,6 +8,7 @@ module Spree
     before_filter :create_notification
 
     skip_before_filter :verify_authenticity_token, :only => [:result, :success, :fail]
+    skip_before_filter :check_authorization, :only => [:result]
     ssl_required :show
 
     def show
