@@ -22,9 +22,9 @@ module Spree
       options[:test_mode] == true
     end
 
-    #def url
+    # def url
     #  self.test? ? "http://test.robokassa.ru/Index.aspx" : "https://merchant.roboxchange.com/Index.aspx"
-    #end
+    # end
 
     def mode
       self.test? ? :test : :production

@@ -1,11 +1,6 @@
-<% content_for :page_title do %>
-  <h1 class="font-41 black"><%= t("robokassa.pay") %></h1>
-<% end %>
-
 <div class="row" data-hook="checkout_header">
-  <h1 class="columns four alpha" data-hook="checkout_title"><%= "#{t('order')} #{@order.number}" %></h1>
-  <div class="columns twelve omega" data-hook="checkout_progress"><%= checkout_progress %></div>
-</div>
+  <h1 class="columns sixteen alpha" data-hook="checkout_title"><%= t('robokassa.details_of_payment', order_number: @order.number) %></h1>
+ --></div>
 
 <%= render :partial => 'spree/shared/order_details', :locals => {:order => @order} %>
 <div class="clear"></div>
@@ -16,10 +11,8 @@
                        :service => :robokassa,
                        :secret => @payment_method.preferred_password1,
                        :html => { :id => 'payment-form' } do |service| %>
-  <!--<div data-hook="inside_cart_form">-->
-    <div class="form-buttons links" data-hook="buttons">
-      <%= submit_tag t(:pay), :class => 'continue button primary' %>
-      <script>Spree.disableSaveOnClick();</script>
-    </div>
-  <!--</div>-->
+  <div class="form-buttons links" data-hook="buttons">
+    <%= submit_tag t(:pay), :class => 'continue button primary' %>
+    <script>Spree.disableSaveOnClick();</script>
+  </div>
 <% end %>

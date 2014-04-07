@@ -7,15 +7,11 @@ TODO: Write a gem description
 
 Add this line to your application's Gemfile:
 
-    gem 'spree_robokassa'
+    gem 'spree_robokassa', :git => 'https://github.com/artemaminov/spree_robokassa.git'
 
 And then execute:
 
     $ bundle
-
-Or install it yourself as:
-
-    $ gem install spree_robokassa
 
 ## Usage
 

@@ -5,7 +5,7 @@ Spree::Order.class_eval do
   end
 
   def valid_zip_code?
-    false
+    true
   end
 
 end

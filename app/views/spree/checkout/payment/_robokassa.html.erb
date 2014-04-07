@@ -1,1 +1,34 @@
 Для выполнения платежа Вы будете перенаправлены на сайт платежной системы Robokassa.
+
+<% payment_service_for @order.id, payment_method.preferred_mrch_login,
+                        :disable_form_tag => true,
+                        :amount => @order.total,
+                        :service => :robokassa,
+                        :secret => payment_method.preferred_password1,
+                        :html => { :id => 'payment-form' } do |service| %>
+<% end %>
+
+<script>
+  Robokassa = {
+    hidePaymentSaveAndContinueButton: function(paymentMethod) {
+      if (Robokassa.paymentMethodID && paymentMethod.val() == Robokassa.paymentMethodID) {
+        $('#checkout_form_payment').attr('action', '<%= payment_method.provider_class.service_url %>');
+        // $('.continue').hide();
+      } else {
+        $('#checkout_form_payment').attr('action', originUrl);
+        // $('.continue').show();
+      }
+    }
+  }
+
+  $(document).ready(function() {
+    checkedPaymentMethod = $('div[data-hook="checkout_payment_step"] input[type="radio"]:checked');
+    Robokassa.hidePaymentSaveAndContinueButton(checkedPaymentMethod);
+    paymentMethods = $('div[data-hook="checkout_payment_step"] input[type="radio"]').click(function (e) {
+      Robokassa.hidePaymentSaveAndContinueButton($(e.target));
+    });
+  });
+
+  Robokassa.paymentMethodID = "<%= payment_method.id %>";
+  originUrl = $('#checkout_form_payment').attr('action');
+</script>
