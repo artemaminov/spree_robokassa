@@ -22,12 +22,14 @@ module Spree
       options[:test_mode] == true
     end
 
-    # def url
-    #  self.test? ? "http://test.robokassa.ru/Index.aspx" : "https://merchant.roboxchange.com/Index.aspx"
-    # end
+    def service_url
+      self.mode
+      ActiveMerchant::Billing::Integrations::Robokassa.service_url
+      # self.test? ? "http://test.robokassa.ru/Index.aspx" : "https://merchant.roboxchange.com/Index.aspx"
+    end
 
     def mode
-      self.test? ? :test : :production
+      ActiveMerchant::Billing::Base.integration_mode = self.test? ? :test : :production
     end
 
     #def self.current
