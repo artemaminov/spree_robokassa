@@ -9,7 +9,7 @@ module Spree
     ssl_required :show
 
     def show
-      # ActiveMerchant::Billing::Base.integration_mode = @payment_method.mode
+      ActiveMerchant::Billing::Base.integration_mode = @payment_method.mode
       if @order.blank? || @payment_method.blank?
         flash[:error] = I18n.t("invalid_arguments")
         redirect_to :back
@@ -31,7 +31,6 @@ module Spree
         #  end
         #end
         render :text => @notification.success_response
-        #render :text => "OK#{@order.id}"
       else
         #payment.failure!
         render :text => "Invalid Signature"

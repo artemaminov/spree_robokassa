@@ -9,10 +9,8 @@
 <% end %>
 
 <script>
-  originUrl = $('#checkout_form_payment').attr('action');
-
   Robokassa = {
-    hidePaymentSaveAndContinueButton: function(paymentMethod) {
+    changeFormActionURL: function(paymentMethod) {
       if (Robokassa.paymentMethodID && paymentMethod.val() == Robokassa.paymentMethodID) {
         $('#checkout_form_payment').attr('action', '<%= payment_method.service_url %>');
         // $('.continue').hide();
@@ -25,11 +23,12 @@
 
   $(document).ready(function() {
     checkedPaymentMethod = $('div[data-hook="checkout_payment_step"] input[type="radio"]:checked');
-    Robokassa.hidePaymentSaveAndContinueButton(checkedPaymentMethod);
+    Robokassa.changeFormActionURL(checkedPaymentMethod);
     paymentMethods = $('div[data-hook="checkout_payment_step"] input[type="radio"]').click(function (e) {
-      Robokassa.hidePaymentSaveAndContinueButton($(e.target));
+      Robokassa.changeFormActionURL($(e.target));
     });
   });
 
   Robokassa.paymentMethodID = "<%= payment_method.id %>";
+  originUrl = $('#checkout_form_payment').attr('action');
 </script>

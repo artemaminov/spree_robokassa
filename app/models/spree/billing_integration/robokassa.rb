@@ -7,6 +7,7 @@ module Spree
     attr_accessible :preferred_password1, :preferred_password2, :preferred_mrch_login
 
     def provider_class
+      ActiveMerchant::Billing::Base.integration_mode = self.mode
       ActiveMerchant::Billing::Integrations::Robokassa
     end
 
@@ -22,14 +23,12 @@ module Spree
       options[:test_mode] == true
     end
 
-    def service_url
-      self.mode
-      ActiveMerchant::Billing::Integrations::Robokassa.service_url
-      # self.test? ? "http://test.robokassa.ru/Index.aspx" : "https://merchant.roboxchange.com/Index.aspx"
+    def mode
+      self.test? ? :test : :production
     end
 
-    def mode
-      ActiveMerchant::Billing::Base.integration_mode = self.test? ? :test : :production
+    def service_url
+      self.provider_class.service_url
     end
 
     #def self.current
