@@ -1,12 +1,14 @@
 module Spree
-  class RobokassaController < Spree::CheckoutController
+  class RobokassaController < Spree::StoreController
 
     before_filter :find_payment
     before_filter :create_notification
 
     skip_before_filter :verify_authenticity_token, :only => [:result, :success, :fail]
-    skip_before_filter :check_authorization, :only => [:result]
+    skip_before_filter :check_authorization, :only => [:result, :success, :fail]
     ssl_required :show
+
+    helper 'spree/orders'
 
     def show
       ActiveMerchant::Billing::Base.integration_mode = @payment_method.mode
@@ -55,6 +57,7 @@ module Spree
 
     def find_payment
       robokassa_payment_method = Spree::PaymentMethod.find_by_type('Spree::BillingIntegration::Robokassa')
+      @order = Order.find_by_number params[:order_number]
       @payment_method = @order.available_payment_methods.detect{|x| x.id == robokassa_payment_method.id }
     end
 
