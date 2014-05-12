@@ -13,7 +13,7 @@ Spree::CheckoutController.class_eval do
 
     payment_method = Spree::PaymentMethod.find(params[:order][:payments_attributes].first[:payment_method_id])
     if payment_method && payment_method.kind_of?(Spree::BillingIntegration::Robokassa)
-      redirect_to robokassa_path(:order_number => @order.number)
+      redirect_to robokassa_path(:shporder_number => @order.number)
     end
 
   end

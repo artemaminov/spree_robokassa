@@ -6,6 +6,7 @@
                         :service => :robokassa,
                         :secret => payment_method.preferred_password1,
                         :html => { :id => 'payment-form' } do |service| %>
+  <% service.shporder_number @order.number %>
 <% end %>
 
 <script>

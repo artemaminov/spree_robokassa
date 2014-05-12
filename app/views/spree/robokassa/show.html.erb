@@ -11,6 +11,7 @@
                        :service => :robokassa,
                        :secret => @payment_method.preferred_password1,
                        :html => { :id => 'payment-form' } do |service| %>
+  <% service.shporder_number @order.number %>
   <div class="form-buttons links" data-hook="buttons">
     <%= submit_tag t(:pay), :class => 'continue button primary' %>
     <script>Spree.disableSaveOnClick();</script>

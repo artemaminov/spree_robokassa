@@ -57,7 +57,7 @@ module Spree
 
     def find_payment
       robokassa_payment_method = Spree::PaymentMethod.find_by_type('Spree::BillingIntegration::Robokassa')
-      @order = Order.find_by_number params[:order_number]
+      @order = Order.find_by_number params[:shporder_number]
       @payment_method = @order.available_payment_methods.detect{|x| x.id == robokassa_payment_method.id }
     end
 
