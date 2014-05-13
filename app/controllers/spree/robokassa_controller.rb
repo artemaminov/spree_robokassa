@@ -1,7 +1,7 @@
 module Spree
   class RobokassaController < Spree::StoreController
 
-    before_filter :find_payment
+    before_filter :find_payment_method
     before_filter :create_notification
 
     skip_before_filter :verify_authenticity_token, :only => [:result, :success, :fail]
@@ -55,10 +55,12 @@ module Spree
 
     private
 
-    def find_payment
-      robokassa_payment_method = Spree::PaymentMethod.find_by_type('Spree::BillingIntegration::Robokassa')
-      @order = Order.find_by_number params[:shporder_number]
-      @payment_method = @order.available_payment_methods.detect{|x| x.id == robokassa_payment_method.id }
+    def find_payment_method
+      @order = Order.find params[:InvId]
+      robokassa_payment_methods = Spree::PaymentMethod.find_all_by_type('Spree::BillingIntegration::Robokassa')
+      robokassa_payment_methods.each do |robokassa_payment_method|
+        @payment_method ||= @order.available_payment_methods.detect { |x| x.id == robokassa_payment_method.id }
+      end
     end
 
     def create_notification

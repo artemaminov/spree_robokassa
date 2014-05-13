@@ -7,7 +7,7 @@ ru:
   payment_fail: Не удалось провести оплату
   payment_success: Оплата выполнена успешно
   robokassa:
-    details_of_payment: "Оплата заказа %{order_number}"
+    details_of_payment: "Оплата заказа %{InvId}"
     pay: Оплата
     success_url: Success URL
     result_url: Result URL

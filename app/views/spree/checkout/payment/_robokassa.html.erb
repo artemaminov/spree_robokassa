@@ -6,7 +6,6 @@
                         :service => :robokassa,
                         :secret => payment_method.preferred_password1,
                         :html => { :id => 'payment-form' } do |service| %>
-  <% service.shporder_number @order.number %>
 <% end %>
 
 <script>
@@ -23,13 +22,12 @@
   }
 
   $(document).ready(function() {
+    Robokassa.paymentMethodID = "<%= payment_method.id %>";
+    originUrl = $('#checkout_form_payment').attr('action');
     checkedPaymentMethod = $('div[data-hook="checkout_payment_step"] input[type="radio"]:checked');
     Robokassa.changeFormActionURL(checkedPaymentMethod);
     paymentMethods = $('div[data-hook="checkout_payment_step"] input[type="radio"]').click(function (e) {
       Robokassa.changeFormActionURL($(e.target));
     });
   });
-
-  Robokassa.paymentMethodID = "<%= payment_method.id %>";
-  originUrl = $('#checkout_form_payment').attr('action');
 </script>
