@@ -31,9 +31,14 @@ module Spree
       self.provider_class.service_url
     end
 
-    #def self.current
-    #  self.where(:type => self.to_s, :environment => Rails.env, :active => true).first
-    #end
+    def self.current
+      robokassa_payment_methods = self.find_all_by_type(self.to_s)
+      available_payment_methods = (PaymentMethod.available(:front_end) + PaymentMethod.available(:both)).uniq
+      robokassa_payment_methods.each do |robokassa_payment_method|
+        @payment_method ||= available_payment_methods.detect { |x| x.id == robokassa_payment_method.id }
+      end
+      @payment_method
+    end
 
     #def desc
     #  "<p>
