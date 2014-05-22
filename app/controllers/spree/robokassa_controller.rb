@@ -1,40 +1,30 @@
 module Spree
   class RobokassaController < Spree::StoreController
 
+    before_filter :find_order
+    before_filter :find_or_create_payment
     before_filter :find_payment_method
     before_filter :create_notification
 
-    skip_before_filter :verify_authenticity_token, :only => [:result, :success, :fail]
-    skip_before_filter :check_authorization, :only => [:result, :success, :fail]
+    skip_before_filter :verify_authenticity_token
     ssl_required :show
 
     helper 'spree/orders'
 
-    def show
-      ActiveMerchant::Billing::Base.integration_mode = @payment_method.mode
-      if @order.blank? || @payment_method.blank?
-        flash[:error] = I18n.t("invalid_arguments")
-        redirect_to :back
-      else
-        render :action => :show
-      end
-    end
-
     def result
-      if @order && @payment_method && @notification.acknowledge
-        #payment = @order.payments.create(
-        #    amount: params["OutSum"].to_f,
-        #    payment_method_id: @order.available_payment_methods.first.id)
-        ## Need to force checkout to complete state
-        #until @order.state == "complete"
-        #  if @order.next!
-        #    @order.update!
-        #    state_callback(:after)
-        #  end
-        #end
+      if @order.completed?
+        render :text => "Order already completed!" and return
+      end
+      @payment.amount = @notification.amount
+      @payment.payment_method_id = @payment_method.id
+      @payment.state = "checkout" if @payment.persisted?
+      @payment.save
+      if @notification.amount >= @order.total && @payment_method && @notification.acknowledge
+        @order.next
+        @payment.complete
+        @order.update!
         render :text => @notification.success_response
       else
-        #payment.failure!
         render :text => "Invalid Signature"
       end
     end
@@ -55,12 +45,16 @@ module Spree
 
     private
 
-    def find_payment_method
+    def find_order
       @order = Order.find params[:InvId]
-      robokassa_payment_methods = Spree::PaymentMethod.find_all_by_type('Spree::BillingIntegration::Robokassa')
-      robokassa_payment_methods.each do |robokassa_payment_method|
-        @payment_method ||= @order.available_payment_methods.detect { |x| x.id == robokassa_payment_method.id }
-      end
+    end
+
+    def find_or_create_payment
+      @payment = @order.payments.last || @order.payments.build
+    end
+
+    def find_payment_method
+      @payment_method = Spree::BillingIntegration::Robokassa.current
     end
 
     def create_notification
