@@ -4,8 +4,9 @@ ru:
   mrch_login: MerchantLogin магазина (обязательный параметр)
   password1: Пароль 1
   password2: Пароль 2
-  payment_fail: Не удалось провести оплату
   payment_success: Оплата выполнена успешно
+  payment_success_fail: При выполнении платежа возникла ошибка!
+  payment_void: Оплата отменена
   robokassa:
     details_of_payment: "Оплата заказа %{InvId}"
     pay: Оплата

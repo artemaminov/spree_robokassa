@@ -1,23 +1,19 @@
 module Spree
   class RobokassaController < Spree::StoreController
 
-    before_filter :find_order
-    before_filter :find_or_create_payment
-    before_filter :find_payment_method
-    before_filter :create_notification
+    before_filter :load_order
 
     skip_before_filter :verify_authenticity_token
-    ssl_required :show
+    # ssl_required :result
 
     helper 'spree/orders'
 
     def result
-      if @order.completed?
+      if @order && @order.completed?
         render :text => "Order already completed!" and return
       end
       @payment.amount = @notification.amount
       @payment.payment_method_id = @payment_method.id
-      @payment.state = "checkout" if @payment.persisted?
       @payment.save
       if @notification.amount >= @order.total && @payment_method && @notification.acknowledge
         @order.next
@@ -25,32 +21,51 @@ module Spree
         @order.update!
         render :text => @notification.success_response
       else
-        render :text => "Invalid Signature"
+        @payment.pend
+        render :text => "Invalid signature"
       end
     end
 
     def success
-      if @order && @payment_method && @notification.acknowledge && @order.complete?
+      if @order && @payment_method && @notification.acknowledge && @order.completed?
         session[:order_id] = nil
         redirect_to order_path(@order), :notice => I18n.t("payment_success")
       else
-        flash[:error] =  t("payment_fail")
+        flash[:error] = t("payment_success_fail")
+        redirect_to @order.blank? ? root_url : checkout_state_path("payment")
       end
     end
 
     def fail
-      flash[:error] = t("payment_fail")
-      redirect_to @order.blank? ? root_url : checkout_state_path("payment")
+      if @order
+        @payment.save
+        @payment.void
+        flash[:error] = t("payment_void")
+        redirect_to @order.blank? ? root_url : checkout_state_path("payment")
+      end
     end
 
     private
 
-    def find_order
-      @order = Order.find params[:InvId]
+    def load_order
+      if params[:InvId]
+        begin
+          @order = Order.find params[:InvId]
+        rescue ActiveRecord::RecordNotFound
+          render :text => "Order not found"
+        else
+          create_payment
+          find_payment_method
+          create_notification
+          return @order
+        end
+      else
+        render :text => "Incorrect request"
+      end
     end
 
-    def find_or_create_payment
-      @payment = @order.payments.last || @order.payments.build
+    def create_payment
+      @payment = @order.payments.build
     end
 
     def find_payment_method
