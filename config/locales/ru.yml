@@ -8,11 +8,14 @@ ru:
   payment_success_fail: При выполнении платежа возникла ошибка!
   payment_void: Оплата отменена
   robokassa:
+    completed: Успешная оплата
     details_of_payment: "Оплата заказа %{InvId}"
     pay: Оплата
+    pending: Ожидание оплаты
     success_url: Success URL
     result_url: Result URL
     fail_url: Fail URL
+    void: Оплата отменена
   spree:
     order_state:
       order_confirm: Подтверждение

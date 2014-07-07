@@ -13,7 +13,6 @@ module Spree
         render :text => "Order already completed!" and return
       end
       @payment.amount = @notification.amount
-      @payment.payment_method_id = @payment_method.id
       @payment.save
       if @notification.amount >= @order.total && @payment_method && @notification.acknowledge
         @order.next
@@ -41,7 +40,7 @@ module Spree
         @payment.save
         @payment.void
         flash[:error] = t("payment_void")
-        redirect_to @order.blank? ? root_url : checkout_state_path("payment")
+        redirect_to @order.blank? ? root_url : cart_path
       end
     end
 
@@ -54,8 +53,8 @@ module Spree
         rescue ActiveRecord::RecordNotFound
           render :text => "Order not found"
         else
+          find_robokassa_payment_method
           create_payment
-          find_payment_method
           create_notification
           return @order
         end
@@ -66,9 +65,10 @@ module Spree
 
     def create_payment
       @payment = @order.payments.build
+      @payment.payment_method_id = @payment_method.id
     end
 
-    def find_payment_method
+    def find_robokassa_payment_method
       @payment_method = Spree::BillingIntegration::Robokassa.current
     end
 
