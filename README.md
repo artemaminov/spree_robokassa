@@ -1,7 +1,7 @@
 # Spree Robokassa
 =====================
 
-TODO: Write a gem description
+Robokassa payment gem for Spree 2.0
 
 ## Installation
 
