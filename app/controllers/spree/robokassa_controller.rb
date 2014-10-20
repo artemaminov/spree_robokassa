@@ -28,7 +28,7 @@ module Spree
     def success
       if @order && @payment_method && @notification.acknowledge && @order.completed?
         session[:order_id] = nil
-        redirect_to order_path(@order), :notice => I18n.t("payment_success")
+        redirect_to order_path(@order, { :checkout_complete => true, :token => @order.token }), :notice => I18n.t("payment_success")
       else
         flash[:error] = t("payment_success_fail")
         redirect_to @order.blank? ? root_url : checkout_state_path("payment")
