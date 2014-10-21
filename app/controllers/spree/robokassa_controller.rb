@@ -73,7 +73,8 @@ module Spree
     end
 
     def create_notification
-      @notification = @payment_method.provider_class::Notification.new(request.raw_post, :secret => @payment_method.preferred_password2)
+      secret = (@payment_method.preferred_password2 if params[:action] == "result") || @payment_method.preferred_password1
+      @notification = @payment_method.provider_class::Notification.new(request.raw_post, :secret => secret)
     end
 
 
